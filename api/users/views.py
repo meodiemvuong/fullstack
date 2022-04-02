@@ -49,7 +49,7 @@ class UserLogin(APIView):
         if not (user.check_password(request.data['password'])):
             return Response({"message": "Sai mat khau"})
         is_admin = user.is_staff
-        
+        auth.login(request, user=user)
         token, created = Token.objects.get_or_create(user = user)
         response = Response()
         response.set_cookie('Token',token)
