@@ -50,6 +50,7 @@ class UserLogin(APIView):
             return Response({"message": "Sai mat khau"})
         is_admin = user.is_staff
         auth.login(request, user=user)
+        print(user)
         token, created = Token.objects.get_or_create(user = user)
         response = Response()
         response.set_cookie('Token',token)
@@ -62,6 +63,7 @@ class UserLogin(APIView):
         
 class UserLogout(APIView):
     def post(self, request):
+        print("hello")
         auth.logout(request)
         response = Response()
         response.delete_cookie('Token')
@@ -71,8 +73,9 @@ class UserLogout(APIView):
         return response
 
 class IsAdmin(APIView):
-    permission_classes = [(permissions.IsAuthenticated)]
+    # permission_classes = [(permissions.IsAuthenticated)]
     def get(self, request):
+        print(request.user)
         user = request.user
         if user.is_staff:
             return Response({"is_admin":True})

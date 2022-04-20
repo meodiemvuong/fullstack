@@ -17,6 +17,8 @@ from django.contrib import admin
 from django.urls import path, include
 from users import urls 
 from product import urlsProduct
+from orders import urlsOrders
+from cart import views
 from django.conf import settings #add this
 from django.conf.urls.static import static #add this
 
@@ -24,4 +26,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include(urls)),
     path('', include(urlsProduct)),
+    path('', include(urlsOrders)),
+    path('cart/', views.CartAdd.as_view())
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
