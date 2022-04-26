@@ -3,7 +3,6 @@ from rest_framework.views import APIView, Response
 from rest_framework.authtoken.models import Token
 from users.models import User
 from users.serializers import UserSerializer
-from rest_framework.exceptions import AuthenticationFailed
 from rest_framework import exceptions
 from rest_framework import permissions
 from rest_framework import exceptions

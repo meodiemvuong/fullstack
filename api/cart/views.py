@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import Response, APIView
-from rest_framework import permissions
+from rest_framework import permissions, exceptions
 from cart.cart import Cart
 from product.models import Product
 from product.serializers import ProductSerializer 
@@ -14,7 +14,10 @@ class CartAdd(APIView):
     def post(self, request):
         cart = Cart(request)
         id = request.data['id']
-        product = Product.objects.get(pk=id)
+        try:
+            product = Product.objects.get(pk=id)
+        except Product.DoesNotExist:
+            raise exceptions.APIException("Khong co san pham")
         serializer = ProductSerializer(product)
         if(cart.cart.get(str(id))):
             quantity = cart.cart[str(id)].get('quantity') + 1 
@@ -25,7 +28,6 @@ class CartAdd(APIView):
             }
             cart.save()
             return Response(cart.cart)
-        else: 
+        else:
             cart.add(id, serializer.data['price'])
             return Response(cart.cart)
-        

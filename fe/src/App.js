@@ -8,6 +8,7 @@ import HomeAdmin from './Admin/Home/HomeAdmin';
 import UsersAdmin from './Admin/Users/UsersAdmin';
 import HeaderAdmin from './Admin/HeaderAdmin/HeaderAdmin';
 import { BrowserRouter } from 'react-router-dom';
+import ProductDetail from './ProductDetail/ProductDetail';
 function App() {
   return (
     
@@ -17,6 +18,12 @@ function App() {
           <>
           <Header />
           <Home />
+          </>
+        } />
+        <Route path='/products/:id' element={
+          <>
+          <Header />
+          <ProductDetail />
           </>
         } />
         <Route path="/login" element={

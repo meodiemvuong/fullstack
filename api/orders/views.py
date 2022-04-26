@@ -20,7 +20,7 @@ class CreateOrder(APIView):
         total_price = cart.get_total_price()
         order = Order(user=self.request.user, total_price=total_price, status='Pending' )
         order.save()
-        serializer = OrderSerializer(order, many=True)
+        serializer = OrderSerializer(order)
         products = Product.objects.filter(id__in=cart.cart.keys())
         orderitems = []
         print(products)
@@ -30,7 +30,7 @@ class CreateOrder(APIView):
             orderitems.append(OrderItem(order=order,product = i, quantity = q, total = q*i.price ))
         OrderItem.objects.bulk_create(orderitems)
         cart.clear()
-        return Response({'data': cart.cart, 'orders': serializer.data})
+        return Response({'order': serializer.data})        
 
 class OrderDetail(APIView):
     def get(self, request, pk):
