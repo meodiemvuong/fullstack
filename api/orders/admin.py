@@ -8,7 +8,7 @@ class OrderItemTabuler(admin.TabularInline):
     extra = 0
     raw_name_fields = ['product', ]
 
-admin.site.register(OrderItem)
+# admin.site.register(OrderItem)
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['user', 'total_price',

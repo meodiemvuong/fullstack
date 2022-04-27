@@ -1,6 +1,3 @@
-from asyncio.windows_events import NULL
-from enum import unique
-from unicodedata import category
 from django.db import models
 
 # Create your models here.

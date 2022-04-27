@@ -11,8 +11,9 @@ from cart.cart import Cart
 class CreateOrder(APIView):
     def get(self, request):
         order =Order.objects.filter(user=request.user)
+        cart = Cart(request)
         serializer = OrderSerializer(order, many=True)
-        return Response(serializer.data)
+        return Response({'myorder': serializer.data, 'cart': cart.cart})
     def post(self, request):
         cart = Cart(request)
         if len(cart) == 0:

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from rest_framework.views import Response, APIView
 from rest_framework import permissions, exceptions
 from cart.cart import Cart
@@ -9,16 +9,21 @@ class CartAdd(APIView):
     permission_classes = [(permissions.IsAuthenticated)]
     def get(self, request):
         cart = Cart(request)
-        
-        return Response({'data': cart.session['cart']})
+        return Response(cart.cart)
     def post(self, request):
         cart = Cart(request)
-        id = request.data['id']
+        try:
+            id = request.data['id']
+        except KeyError:
+            raise exceptions.APIException("Request dont have id")
         try:
             product = Product.objects.get(pk=id)
         except Product.DoesNotExist:
-            raise exceptions.APIException("Khong co san pham")
+            raise exceptions.APIException("Dont find Product")
         serializer = ProductSerializer(product)
+        product_patch = ProductSerializer(product, data={'amount': serializer.data['amount']-1}, partial=True)
+        if product_patch.is_valid():
+            product_patch.save()
         if(cart.cart.get(str(id))):
             quantity = cart.cart[str(id)].get('quantity') + 1 
             price = cart.cart[str(id)].get('price') + serializer.data['price']
@@ -27,6 +32,7 @@ class CartAdd(APIView):
                 'price': price
             }
             cart.save()
+            
             return Response(cart.cart)
         else:
             cart.add(id, serializer.data['price'])
