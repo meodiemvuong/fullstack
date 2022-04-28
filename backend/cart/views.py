@@ -14,19 +14,23 @@ class CartAdd(APIView):
         cart = Cart(request)
         try:
             id = request.data['id']
+            amount = request.data['quantity']
         except KeyError:
-            raise exceptions.APIException("Request dont have id")
+            raise exceptions.APIException("Request dont have id or quantity")
         try:
             product = Product.objects.get(pk=id)
         except Product.DoesNotExist:
             raise exceptions.APIException("Dont find Product")
         serializer = ProductSerializer(product)
-        product_patch = ProductSerializer(product, data={'amount': serializer.data['amount']-1}, partial=True)
+        if serializer.data['amount'] > amount:
+            product_patch = ProductSerializer(product, data={'amount': serializer.data['amount']-amount}, partial=True)
+        else:
+            raise exceptions.APIException('Out of stock')
         if product_patch.is_valid():
             product_patch.save()
         if(cart.cart.get(str(id))):
-            quantity = cart.cart[str(id)].get('quantity') + 1 
-            price = cart.cart[str(id)].get('price') + serializer.data['price']
+            quantity = cart.cart[str(id)].get('quantity') + amount 
+            price = cart.cart[str(id)].get('price') + serializer.data['price']*amount
             cart.session['cart'][str(id)] = {
                 'quantity': quantity,
                 'price': price
@@ -35,5 +39,5 @@ class CartAdd(APIView):
             
             return Response(cart.cart)
         else:
-            cart.add(id, serializer.data['price'])
+            cart.add(id, serializer.data['price']*amount,amount)
             return Response(cart.cart)
