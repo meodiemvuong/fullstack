@@ -16,10 +16,10 @@ class UserList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data, context={'request': request})
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-        user = User.objects.get(id=serializer.data.get('id'))
+        user = User.objects.get(email=serializer.data.get('email'))
         token, created = Token.objects.get_or_create(user = user)
         return Response({"data": serializer.data,"token": token.key })
 
@@ -49,7 +49,6 @@ class UserLogin(APIView):
             return Response({"message": "Sai mat khau"})
         is_admin = user.is_staff
         auth.login(request, user=user)
-        print(user)
         token, created = Token.objects.get_or_create(user = user)
         response = Response()
         response.set_cookie('Token',token)
@@ -61,6 +60,7 @@ class UserLogin(APIView):
         return response
         
 class UserLogout(APIView):
+    permission_classes = [(permissions.IsAuthenticated)]
     def post(self, request):
         print("hello")
         auth.logout(request)
@@ -72,7 +72,7 @@ class UserLogout(APIView):
         return response
 
 class IsAdmin(APIView):
-    # permission_classes = [(permissions.IsAuthenticated)]
+    permission_classes = [(permissions.IsAuthenticated)]
     def get(self, request):
         print(request.user)
         user = request.user
